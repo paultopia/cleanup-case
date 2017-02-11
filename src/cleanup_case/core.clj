@@ -20,14 +20,27 @@
   (:require [net.cgrand.enlive-html :as html])
   (:gen-class))
 
-(defn footnote-text [filename]
-  (let [tree (html/html-resource filename)]
-    (mapv html/text
-          (html/select tree [:p.p24]))))
+(def working-file (atom {}))
+
+(defn tree-from-file [filename]
+  (html/html-resource (java.io.StringReader. (slurp filename))))
+
+(defn selectvec
+  "selector is a vector"
+  [tree selector]
+  (mapv html/text
+        (html/select tree selector)))
+
+(defn footnote-text [tree]
+    (selectvec tree [:p.p24]))
+
 
 (defn -main
   "in experimenting"
   [& args]
-  (println (footnote-text "nfiborig.html"))
+  (do
+    (reset! working-file (tree-from-file "nfiborig.html"))
+    (let [tree @working-file]
+    (println (first (footnote-text tree)))
   ;; (println (slurp "nfiborig.html"))
-  )
+  )))

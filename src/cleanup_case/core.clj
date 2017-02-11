@@ -26,8 +26,14 @@
 
 (def working-file (atom {}))
 
+(defn mark-footnote-refs [case-string]
+  (str/replace case-string #"<span class=\"s2\"><sup>(\d*)<\/sup><\/span>" "[note $1]"))
+
 (defn tree-from-file [filename]
-  (html/html-resource (java.io.StringReader. (slurp filename))))
+  (html/html-resource
+   (java.io.StringReader.
+    (mark-footnote-refs
+     (slurp filename)))))
 
 (defn selectvec
   "selector is a vector"
@@ -49,6 +55,7 @@
     (str "Footnotes\n"
      (str/join
       (interleave nums dotspace texts parabreaks)))))
+;; this works.
 
 (defn -main
   "in experimenting"
@@ -57,5 +64,4 @@
     (reset! working-file (tree-from-file "nfiborig.html"))
     (let [tree @working-file]
       (println (extract-footnotes tree))
-  ;; (println (slurp "nfiborig.html"))
   )))

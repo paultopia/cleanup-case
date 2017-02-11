@@ -15,9 +15,13 @@
 
   Really need to double-check and make sure this works for all cases
 
+  If not, I can probably find the anchor for footnote numbers just by searching for the word Footnotes in a table and grabbing the class before that via regex, then incrementing for text.
+
 
   "
-  (:require [net.cgrand.enlive-html :as html])
+  (:require
+   [net.cgrand.enlive-html :as html]
+   [clojure.string :as str])
   (:gen-class))
 
 (def working-file (atom {}))
@@ -31,9 +35,20 @@
   (mapv html/text
         (html/select tree selector)))
 
-(defn footnote-text [tree]
+(defn footnote-texts [tree]
     (selectvec tree [:p.p24]))
 
+(defn footnote-numbers [tree]
+  (vec (rest (selectvec tree [:p.p23]))))
+
+(defn extract-footnotes [tree]
+  (let [nums (footnote-numbers tree)
+        texts (footnote-texts tree)
+        parabreaks (repeat "\n\n")
+        dotspace (repeat ". ")]
+    (str "Footnotes\n"
+     (str/join
+      (interleave nums dotspace texts parabreaks)))))
 
 (defn -main
   "in experimenting"
@@ -41,6 +56,6 @@
   (do
     (reset! working-file (tree-from-file "nfiborig.html"))
     (let [tree @working-file]
-    (println (first (footnote-text tree)))
+      (println (extract-footnotes tree))
   ;; (println (slurp "nfiborig.html"))
   )))

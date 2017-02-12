@@ -1,13 +1,10 @@
 (ns cleanup-case.core
+  "This is inefficient as all hell but does the trick."
   (:require
    [net.cgrand.enlive-html :as html]
    [clojure.string :as str]
    [clojure.java.shell :refer [sh]])
   (:gen-class))
-
-;; utility pieces
-
-(def working-file (atom {}))
 
 (defn split-opinion [page-html]
   (let [[front body] (str/split page-html #"<p class=\"p\d+\"><b>Opinion</b></p>" 2)
@@ -21,8 +18,11 @@
 (defn make-tree [hstring]
   (-> hstring html/html-snippet html/html-resource))
 
-(defn trees-from-file [filename]
-  (let [htmlfile (pre-clean (slurp filename))
+(defn string-from-rtf [filename]
+ (:out (sh "textutil" "-convert" "html" filename "-stdout")))
+
+(defn trees-from-string [htmlstring]
+  (let [htmlfile (pre-clean htmlstring)
         opinion (split-opinion htmlfile)]
     {:opinion (make-tree opinion) :wholebody (make-tree htmlfile)}))
 
@@ -32,12 +32,8 @@
   (mapv html/text
         (html/select tree selector)))
 
-;; footnotes
-
 (defn simple-footnotes [tree]
   (str/join "\n" (mapv html/text (html/select tree [:td :p]))))
-
-;; paragraphs
 
 (defn clean-paragraph [paragraph]
   (let [s1 (str/replace paragraph #"\s?\*+\d+\s?" " ")
@@ -46,7 +42,6 @@
 
 (defn remove-bad-grafs [paragraph-vec]
   (remove str/blank? paragraph-vec))
-;; this doesn't actually seem to be doing anything, but I've hacked around it so whev.
 
 (defn extract-paragraphs [tree]
   (let [raw-ps (mapv html/text (html/select tree [:p]))
@@ -54,13 +49,9 @@
         cleaned-ps (mapv clean-paragraph filtered-ps)]
     (str/join "\n" cleaned-ps)))
 
-
-;; tie it together
-
-(defn extract-citation [whole-tree filename]
+(defn extract-citation [whole-tree name]
   (let [paragraphs (mapv html/text (html/select whole-tree [:p]))
         cite (first (remove str/blank? paragraphs))
-        name (subs filename 0 (- (count filename) 5))
         decdate (first (filter #(str/starts-with? % "Decided ") paragraphs))
         decyear (re-find #"\d\d\d\d" decdate)]
     (str name ", " cite " (" decyear ").")))
@@ -69,18 +60,11 @@
   (let [base-file (str citation "\n\n" (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]
     (first (str/split base-file #"End of Document"))))
 
-;;; main for testing and stuff
-
 (defn -main
-  "in experimenting"
-  [& args]
-  (let [filename "National League of Cities v Usery.html"]
-    (reset! working-file (trees-from-file filename))
-    (let [opinion (:opinion @working-file)
-          wholebody (:wholebody @working-file)
-          citation (extract-citation wholebody filename)
-          test-rtfname "National Federation of Independent Business v Sebelius.rtf"
-          htmlstring (:out (sh "textutil" "-convert" "html" test-rtfname "-stdout"))]
-      ;; (spit "test-paragraphs.txt" (extract-body-and-footnotes citation opinion wholebody))
-      (spit "extracted-html" htmlstring)
-     )))
+  [filename]
+  (let [htmlstring (string-from-rtf filename)
+        {:keys [opinion wholebody]} (trees-from-string htmlstring)
+        name (subs filename 0 (- (count filename) 4))
+        citation (extract-citation wholebody name)
+        newname (str name ".txt")]
+    (spit newname (extract-body-and-footnotes citation opinion wholebody))))

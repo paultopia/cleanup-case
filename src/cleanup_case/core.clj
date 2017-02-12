@@ -61,21 +61,6 @@
 
 ;; footnotes
 
-(defn footnote-texts [tree]
-    (selectvec tree [:p.p24]))
-
-(defn footnote-numbers [tree]
-  (vec (rest (selectvec tree [:p.p23]))))
-
-(defn extract-footnotes [tree]
-  (let [nums (footnote-numbers tree)
-        texts (footnote-texts tree)
-        parabreaks (repeat "\n\n")
-        dotspace (repeat ". ")]
-    (str "Footnotes\n"
-     (str/join
-      (interleave nums dotspace texts parabreaks)))))
-
 (defn simple-footnotes [tree]
   (str/join "\n" (mapv html/text (html/select tree [:td :p]))))
 
@@ -102,8 +87,8 @@
 
 
 (defn extract-body-and-footnotes [opinion-tree whole-tree]
-  (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree)))
-
+  (let [base-file (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]
+    (first (str/split base-file #"End of Document"))))
 
 ;;; main for testing and stuff
 

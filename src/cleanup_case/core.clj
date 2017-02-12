@@ -30,15 +30,18 @@
 
 (def working-file (atom {}))
 
-(defn split-on-opinion [page-html]
-  (let [[front body] (str/split page-html #"<p class=\"p17\"><b>Opinion</b></p>" 2)]
-  {:front front :body body}))
+(defn split-opinion [page-html]
+  (let [[front body] (str/split page-html #"<p class=\"p\d+\"><b>Opinion</b></p>" 2)
+        [opinion footnotes] (str/split body #"<table" 2)]
+    {:opinion opinion :footnotes (str "<table" footnotes)}))
 
 (defn pre-clean [case-string]
   (let [s1 (str/replace case-string #"<span class=\"s2\"><sup>(\d*)<\/sup><\/span>" "[note $1]") ; note markers
-        s2 (str/replace s1 #"p18" "p10") ; make opinion author labels real paragraphs
-        s3 (str/replace s2 #"p21" "p10") ; make opinion author labels real paragraphs
-        final-string (str/replace s3 #"p11" "p10")] ; make opinion author labels real paragraphs
+        s2 (str/replace s1 #"p18" "p10") 
+        s3 (str/replace s2 #"p21" "p10")
+        s4 (str/replace s3 #"p9" "p10")
+        final-string (str/replace s4 #"p11" "p10")]
+
    final-string))
 
 
@@ -46,8 +49,8 @@
   (-> hstring html/html-snippet html/html-resource))
 
 (defn trees-from-file [filename]
-  (let [{:keys [front body]} (split-on-opinion (pre-clean (slurp filename)))]
-    {:front (make-tree front) :body (make-tree body)}))
+  (let [{:keys [opinion footnotes]} (split-opinion (pre-clean (slurp filename)))]
+    {:opinion (make-tree opinion) :footnotes (make-tree footnotes)}))
 
 ;; (defn tree-from-file [filename]
 ;;   (html/html-resource
@@ -96,6 +99,11 @@
     (str/join "\n" cleaned-ps)))
 
 
+;; tie it together
+
+(defn extract-body-and-footnotes [opinion-tree footnotes-tree]
+  (str (extract-paragraphs opinion-tree) "\n\n" (extract-footnotes footnotes-tree)))
+
 
 ;;; main for testing and stuff
 
@@ -104,6 +112,7 @@
   [& args]
   (do
     (reset! working-file (trees-from-file "nfiborig.html"))
-    (let [tree (:body @working-file)]
-      (spit "test-paragraphs.txt" (extract-paragraphs tree))
+    (let [opinion (:opinion @working-file)
+          footnotes (:footnotes @working-file)]
+      (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion footnotes))
   )))

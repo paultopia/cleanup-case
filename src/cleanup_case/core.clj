@@ -87,8 +87,10 @@
 (defn extract-citation [whole-tree filename]
   (let [paragraphs (mapv html/text (html/select whole-tree [:p]))
         cite (first (remove str/blank? paragraphs))
-        name (subs filename 0 (- (count filename) 5))]
-    (str name ", " cite)))
+        name (subs filename 0 (- (count filename) 5))
+        decdate (first (filter #(str/starts-with? % "Decided ") paragraphs))
+        decyear (re-find #"\d\d\d\d" decdate)]
+    (str name ", " cite " (" decyear ").")))
 
 (defn extract-body-and-footnotes [opinion-tree whole-tree]
   (let [base-file (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]

@@ -84,7 +84,11 @@
 
 ;; tie it together
 
-
+(defn extract-citation [whole-tree filename]
+  (let [paragraphs (mapv html/text (html/select whole-tree [:p]))
+        cite (first (remove str/blank? paragraphs))
+        name (subs filename 0 (- (count filename) 5))]
+    (str name ", " cite)))
 
 (defn extract-body-and-footnotes [opinion-tree whole-tree]
   (let [base-file (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]
@@ -95,9 +99,10 @@
 (defn -main
   "in experimenting"
   [& args]
-  (do
-    (reset! working-file (trees-from-file "nfiborig.html"))
+  (let [filename "nfiborig.html"]
+    (reset! working-file (trees-from-file filename))
     (let [opinion (:opinion @working-file)
           wholebody (:wholebody @working-file)]
-      (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion wholebody))
+      ;;(spit "test-paragraphs.txt" (extract-body-and-footnotes opinion wholebody))
+      (println (extract-citation wholebody filename))
      )))

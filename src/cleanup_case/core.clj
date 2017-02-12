@@ -64,8 +64,6 @@
   (mapv html/text
         (html/select tree selector)))
 
-;; footnotes (working, complete)
-
 (defn footnote-texts [tree]
     (selectvec tree [:p.p24]))
 
@@ -80,6 +78,9 @@
     (str "Footnotes\n"
      (str/join
       (interleave nums dotspace texts parabreaks)))))
+
+(defn easy-footnotes [tree]
+  (str/join (selectvec tree [:td :p])))
 
 ;; paragraphs
 
@@ -114,5 +115,6 @@
     (reset! working-file (trees-from-file "nfiborig.html"))
     (let [opinion (:opinion @working-file)
           footnotes (:footnotes @working-file)]
-      (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion footnotes))
+    ;;  (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion footnotes))
+      (println easy-footnotes footnotes)
   )))

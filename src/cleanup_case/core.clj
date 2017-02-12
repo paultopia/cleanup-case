@@ -24,6 +24,8 @@
    [clojure.string :as str])
   (:gen-class))
 
+;; utility pieces
+
 (def working-file (atom {}))
 
 (defn mark-footnote-refs [case-string]
@@ -41,6 +43,8 @@
   (mapv html/text
         (html/select tree selector)))
 
+;; footnotes (working, complete)
+
 (defn footnote-texts [tree]
     (selectvec tree [:p.p24]))
 
@@ -55,7 +59,22 @@
     (str "Footnotes\n"
      (str/join
       (interleave nums dotspace texts parabreaks)))))
-;; this works.
+
+;; paragraphs
+
+(defn clean-paragraph [paragraph]
+  (identity paragraph)) ; stub
+
+(defn remove-bad-grafs [paragraph-vec]
+  (remove str/blank? paragraph-vec))
+
+(defn extract-paragraphs [tree]
+  (let [raw-ps (selectvec tree [:p.p10])
+        filtered-ps (remove-bad-grafs raw-ps)
+        cleaned-ps (mapv clean-paragraph filtered-ps)]
+    (str/join "\n\n" cleaned-ps)))
+
+;;; main for testing and stuff
 
 (defn -main
   "in experimenting"
@@ -63,5 +82,5 @@
   (do
     (reset! working-file (tree-from-file "nfiborig.html"))
     (let [tree @working-file]
-      (println (extract-footnotes tree))
+      (println (extract-paragraphs tree))
   )))

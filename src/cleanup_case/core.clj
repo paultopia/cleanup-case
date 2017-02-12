@@ -1,7 +1,8 @@
 (ns cleanup-case.core
   (:require
    [net.cgrand.enlive-html :as html]
-   [clojure.string :as str])
+   [clojure.string :as str]
+   [clojure.java.shell :refer [sh]])
   (:gen-class))
 
 ;; utility pieces
@@ -73,10 +74,12 @@
 (defn -main
   "in experimenting"
   [& args]
-  (let [filename "nfiborig.html"]
+  (let [filename "National League of Cities v Usery.html"]
     (reset! working-file (trees-from-file filename))
     (let [opinion (:opinion @working-file)
           wholebody (:wholebody @working-file)
-          citation (extract-citation wholebody filename)]
-      (spit "test-paragraphs.txt" (extract-body-and-footnotes citation opinion wholebody))
+          citation (extract-citation wholebody filename)
+          test-rtfname "National Federation of Independent Business v Sebelius.rtf"]
+      ;; (spit "test-paragraphs.txt" (extract-body-and-footnotes citation opinion wholebody))
+      (sh "textutil" "-convert" "html" test-rtfname)
      )))

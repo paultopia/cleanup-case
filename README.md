@@ -20,6 +20,6 @@ Requires a java runtime environment, probably recent-ish.  If this doesn't work,
 
 4. Alternatively, if you have a bunch of rtf files in the same directory to convert, download process-rtfs.sh from here, rename as appropriate, set the execute bit, and use that to convert an entire directory.
 
-5.  Wait a **long time** (this is slow.  sorry.  go get some coffee.) And you're done.  Your directory will now contain a text file (or a bunch of text files) with the same names, but with .txt instead of .rtf --- and the garbage will be gone.
+Your directory will now contain a text file (or a bunch of text files) with the same names, but with .txt instead of .rtf --- and the garbage will be gone.
 
 (c) 2017 Paul Gowder, MIT license.

@@ -19,7 +19,10 @@
   (-> hstring html/html-snippet html/html-resource))
 
 (defn string-from-rtf [filename]
- (:out (sh "textutil" "-convert" "html" filename "-stdout")))
+  (let
+      [htmlstring (:out (sh "textutil" "-convert" "html" filename "-stdout"))]
+    (shutdown-agents)
+    htmlstring))
 
 (defn trees-from-string [htmlstring]
   (let [htmlfile (pre-clean htmlstring)

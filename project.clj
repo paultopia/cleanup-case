@@ -1,4 +1,4 @@
-(defproject cleanup-case "0.1.0"
+(defproject cleanup-case "0.1.1"
   :description "clean up cases downloaded from westlaw"
   :url "https://github.com/paultopia/cleanup-case"
   :license {:name "MIT License"

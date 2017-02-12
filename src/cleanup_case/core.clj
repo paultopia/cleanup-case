@@ -79,7 +79,8 @@
     (let [opinion (:opinion @working-file)
           wholebody (:wholebody @working-file)
           citation (extract-citation wholebody filename)
-          test-rtfname "National Federation of Independent Business v Sebelius.rtf"]
+          test-rtfname "National Federation of Independent Business v Sebelius.rtf"
+          htmlstring (:out (sh "textutil" "-convert" "html" test-rtfname "-stdout"))]
       ;; (spit "test-paragraphs.txt" (extract-body-and-footnotes citation opinion wholebody))
-      (sh "textutil" "-convert" "html" test-rtfname)
+      (spit "extracted-html" htmlstring)
      )))

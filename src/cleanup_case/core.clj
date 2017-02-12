@@ -33,7 +33,7 @@
 (defn split-opinion [page-html]
   (let [[front body] (str/split page-html #"<p class=\"p\d+\"><b>Opinion</b></p>" 2)
         [opinion footnotes] (str/split body #"<table" 2)]
-    {:opinion opinion :footnotes (str "<table" footnotes)}))
+    opinion))
 
 (defn pre-clean [case-string]
   (let [s1 (str/replace case-string #"<span class=\"s2\"><sup>(\d*)<\/sup><\/span>" "[note $1]") ; note markers
@@ -49,20 +49,17 @@
   (-> hstring html/html-snippet html/html-resource))
 
 (defn trees-from-file [filename]
-  (let [{:keys [opinion footnotes]} (split-opinion (pre-clean (slurp filename)))]
-    {:opinion (make-tree opinion) :footnotes (make-tree footnotes)}))
-
-;; (defn tree-from-file [filename]
-;;   (html/html-resource
-;;    (java.io.StringReader.
-;;     (mark-footnote-refs
-;;      (slurp filename)))))
+  (let [htmlfile (pre-clean (slurp filename))
+        opinion (split-opinion htmlfile)]
+    {:opinion (make-tree opinion) :wholebody (make-tree htmlfile)}))
 
 (defn selectvec
   "selector is a vector"
   [tree selector]
   (mapv html/text
         (html/select tree selector)))
+
+;; footnotes
 
 (defn footnote-texts [tree]
     (selectvec tree [:p.p24]))
@@ -79,8 +76,8 @@
      (str/join
       (interleave nums dotspace texts parabreaks)))))
 
-(defn easy-footnotes [tree]
-  (str/join (selectvec tree [:td :p])))
+(defn simple-footnotes [tree]
+  (str/join "\n" (mapv html/text (html/select tree [:td :p]))))
 
 ;; paragraphs
 
@@ -102,8 +99,10 @@
 
 ;; tie it together
 
-(defn extract-body-and-footnotes [opinion-tree footnotes-tree]
-  (str (extract-paragraphs opinion-tree) "\n\n" (extract-footnotes footnotes-tree)))
+
+
+(defn extract-body-and-footnotes [opinion-tree whole-tree]
+  (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree)))
 
 
 ;;; main for testing and stuff
@@ -114,7 +113,6 @@
   (do
     (reset! working-file (trees-from-file "nfiborig.html"))
     (let [opinion (:opinion @working-file)
-          footnotes (:footnotes @working-file)]
-    ;;  (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion footnotes))
-      (println easy-footnotes footnotes)
-  )))
+          wholebody (:wholebody @working-file)]
+      (spit "test-paragraphs.txt" (extract-body-and-footnotes opinion wholebody))
+     )))

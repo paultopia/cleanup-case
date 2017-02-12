@@ -92,8 +92,8 @@
         decyear (re-find #"\d\d\d\d" decdate)]
     (str name ", " cite " (" decyear ").")))
 
-(defn extract-body-and-footnotes [opinion-tree whole-tree]
-  (let [base-file (str (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]
+(defn extract-body-and-footnotes [citation opinion-tree whole-tree]
+  (let [base-file (str citation "\n\n" (extract-paragraphs opinion-tree) "\n\n" (simple-footnotes whole-tree))]
     (first (str/split base-file #"End of Document"))))
 
 ;;; main for testing and stuff
@@ -104,7 +104,7 @@
   (let [filename "nfiborig.html"]
     (reset! working-file (trees-from-file filename))
     (let [opinion (:opinion @working-file)
-          wholebody (:wholebody @working-file)]
-      ;;(spit "test-paragraphs.txt" (extract-body-and-footnotes opinion wholebody))
-      (println (extract-citation wholebody filename))
+          wholebody (:wholebody @working-file)
+          citation (extract-citation wholebody filename)]
+      (spit "test-paragraphs.txt" (extract-body-and-footnotes citation opinion wholebody))
      )))

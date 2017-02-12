@@ -63,7 +63,8 @@
 ;; paragraphs
 
 (defn clean-paragraph [paragraph]
-  (identity paragraph)) ; stub
+  (let [cleaned-paragraph (str/replace paragraph #"\s?\*+\d+\s?" " ")]
+    cleaned-paragraph)) 
 
 (defn remove-bad-grafs [paragraph-vec]
   (remove str/blank? paragraph-vec))
@@ -82,5 +83,5 @@
   (do
     (reset! working-file (tree-from-file "nfiborig.html"))
     (let [tree @working-file]
-      (println (extract-paragraphs tree))
+      (spit "test-paragraphs.txt" (extract-paragraphs tree))
   )))

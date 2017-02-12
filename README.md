@@ -8,16 +8,18 @@ I can't guarantee that this also keeps one out of heat from Westlaw for distribu
 
 Mac only.
 
+Requires a java runtime environment, probably recent-ish.  If this doesn't work, [here are good instructions for installing java](http://stackoverflow.com/questions/24342886/how-to-install-java-8-on-mac).
+
 ## Instructions
 
-1.  Download from westlaw in rtf format.  Relevant settings: full text, footnotes at end, don't "append" or "include" anything.
+1.  Download the executable file from releases tab here.  Set the execute bit (`chmod +x cleancase`)
 
-2.  Use the mac utility textutil to turn the rtf files into html. e.g.  
+2.  Download the case(s) from westlaw in rtf format.  Relevant settings: full text, footnotes at end, don't "append" or "include" anything.
 
-``` 
-textutil National\ League\ of\ Cities\ v\ Usery.rtf -convert html
-```
+3.  Run the program on your file, being sure to escape spaces with backslashes, i.e., `./cleancase Smith\ v \Jones.rtf` 
 
-3.  Run this on the resulting html file.  It'll spit out a plain text file with all the garbage removed.
+4. Alternatively, if you have a bunch of rtf files in the same directory to convert, download process-rtfs.sh from here, rename as appropriate, set the execute bit, and use that to convert an entire directory.
 
-MIT license.
+5.  Wait a **long time** (this is slow.  sorry.  go get some coffee.) And you're done.  Your directory will now contain a text file (or a bunch of text files) with the same names, but with .txt instead of .rtf --- and the garbage will be gone.
+
+(c) 2017 Paul Gowder, MIT license.

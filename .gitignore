@@ -1,9 +1,12 @@
 /target
 /classes
+cleancase
 /checkouts
 pom.xml
 pom.xml.asc
 *.jar
+*.rtf
+*.txt
 *.class
 /.lein-*
 /.nrepl-port

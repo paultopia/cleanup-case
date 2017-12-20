@@ -1,5 +1,12 @@
 # cleanup-case
 
+-----
+
+**Currently being rewritten** --- when rewrite is complete, it'll be a lot more sensible: will not just crash on bad input, and will use a much more sensible strategy (parsing a html file saved from westlaw interface rather than using OSX-dependent utilities to convert a rtf and then regexing it).  For now, you can try the current release, but I've had reports that it's stopped working.
+
+-----
+
+
 Clean up a case downloaded from Westlaw, getting rid of all the junk their downloads included (and the copyrighted stuff to boot), leaving you with just citation, opinion, and footnotes. 
 
 The point being to easily be able to edit and distribute cases (i.e. to students) without having to manually clean up garbage. 

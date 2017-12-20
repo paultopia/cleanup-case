@@ -15,21 +15,20 @@
         date (elements->text (.select soup ".co_date"))]
     (str title "\n\n" cite "\n\n" court "\n\n" date)))
 
-(defn correct-remove-starpages [soup]
+(defn remove-selector [soup selector]
   (let [newsoup soup
-        starpages (.select newsoup ".co_starPage")]
-    (.remove starpages)
+        sel (.select newsoup selector)]
+    (.remove sel)
     newsoup))
 
-(defn incorrect-remove-starpages [soup]
-  (let [starpages (.select soup ".co_starPage")]
-    (.remove starpages)
-    soup))
+(defn remove-selectors [soup selectors]
+  (let [newsoup soup
+        sels (map #(.select newsoup %) selectors)]
+    (run! #(.remove %) sels)
+    newsoup))
 
 (defn -main
   [filename]
-  (do
-    (spit "testbad.html" (.toString (incorrect-remove-starpages (file->soup filename))))
-    (spit "testgood.html" (.toString (correct-remove-starpages (file->soup filename))))
-    )
-  )
+  (let [soup (file->soup filename)]
+    (spit "testmultiple.html" (.toString (remove-selectors soup [".co_starPage" ".co_headnotes"])))
+    ))

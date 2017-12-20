@@ -51,6 +51,6 @@
 (defn -main
   [filename]
   (let [soup (file->soup filename)]
-    (spit "test.html" (.toString (cleanup soup)))
-    (spit "test.txt" (soup->text (cleanup soup)))
+    (spit "out.html" (.toString (cleanup soup)))
+    ;; (spit "test.txt" (soup->text (cleanup soup)))
     ))

@@ -4,6 +4,8 @@
 
 **Currently being rewritten** --- when rewrite is complete, it'll be a lot more sensible: will not just crash on bad input, and will use a much more sensible strategy (parsing a html file saved from westlaw interface rather than using OSX-dependent utilities to convert a rtf and then regexing it).  For now, you can try the current release, but I've had reports that it's stopped working.
 
+current source (not compiled version, which is still old) can take file saved from westlaw and remove all the westlaw gunk, yielding a html file with text that can be copy-pasted, etc.)  text extraction pending (and might involve recompiling jsoup)
+
 -----
 
 

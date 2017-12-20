@@ -27,8 +27,30 @@
     (run! #(.remove %) sels)
     newsoup))
 
+(defn cleanup [soup]
+  (remove-selectors soup [".co_starPage"
+                          ".co_headnotes"
+                          ".co_synopsis"
+                          ".co_blobLink"
+                          "#co_docHeaderContainer"
+                          "#co_docToolbarContainer"
+                          "#co_newHeader"
+                          ".co_footnoteSectionTitle"
+                          "#co_endOfDocument"
+                          "script"
+                          "meta"
+                          "#co_footerContainer"
+                          "input"]))
+
+;; (defn soup->text [soup]
+;;   (let [ptsoup (new HtmlToPlainText​)]
+;;     (.getPlainText​ ptsoup soup)))
+;; does not work because the examples package isn't in the stuff provided by maven build of jsoup.
+
+
 (defn -main
   [filename]
   (let [soup (file->soup filename)]
-    (spit "testmultiple.html" (.toString (remove-selectors soup [".co_starPage" ".co_headnotes"])))
+    (spit "test.html" (.toString (cleanup soup)))
+    (spit "test.txt" (soup->text (cleanup soup)))
     ))
